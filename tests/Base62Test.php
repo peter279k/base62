@@ -261,4 +261,31 @@ class Base62Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals($encoded, $encoded5);
         $this->assertEquals($data, $decoded5);
     }
+
+    public function testShouldKeepLeadingNulls()
+    {
+        $hex = "000000deadbeef";
+        $data = hex2bin($hex);
+        $encoded = (new PhpEncoder)->encode($data);
+        $encoded2 = (new GmpEncoder)->encode($data);
+        $encoded3 = (new BcmathEncoder)->encode($data);
+        $decoded = (new PhpEncoder)->decode($encoded);
+        $decoded2 = (new GmpEncoder)->decode($encoded2);
+        $decoded3 = (new BcmathEncoder)->decode($encoded3);
+
+        $this->assertEquals($decoded2, $decoded);
+        $this->assertEquals($decoded3, $decoded);
+        $this->assertEquals($hex, bin2hex($decoded));
+        $this->assertEquals($hex, bin2hex($decoded2));
+        $this->assertEquals($hex, bin2hex($decoded3));
+
+        $encoded4 = (new Base62)->encode($data);
+        $decoded4 = (new Base62)->decode($encoded4);
+        $this->assertEquals($data, $decoded4);
+
+        $encoded5 = Base62Proxy::encode($data);
+        $decoded5 = Base62Proxy::decode($encoded5);
+        $this->assertEquals($encoded, $encoded5);
+        $this->assertEquals($data, $decoded5);
+    }
 }
